@@ -30,5 +30,3 @@ deployToken()
 	console.error(error)
 	process.exit(1)
 })
-
-// 0x824efEca7EFAA7570983E557FD94967B819b5BC2 on kovan
