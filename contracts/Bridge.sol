@@ -1,11 +1,10 @@
 pragma solidity ^0.8.10;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./ERC20.sol";
 
-contract Bridge is AccessControl, ReentrancyGuard {
+contract Bridge is AccessControl {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     bytes32 public constant VALIDATOR = keccak256("VALIDATOR");
 
@@ -23,7 +22,7 @@ contract Bridge is AccessControl, ReentrancyGuard {
 
     enum Status { EMPTY, SWAP, REDEEM }
 
-    event InitSwap(uint256 chainFrom, uint256 chainTo, address sender, address recipient, uint256 amount, uint256 nonce, bytes signature);
+    event InitSwap(uint256 chainFrom, uint256 chainTo, address sender, address recipient, uint256 amount, uint256 nonce);
     event Redeem(uint256 chainFrom, uint256 chainTo, address sender, address recipient, uint256 amount, uint256 nonce);
 
     function updateTokenAddress(address _addressOfToken) public onlyRole(ADMIN) {
@@ -45,10 +44,10 @@ contract Bridge is AccessControl, ReentrancyGuard {
         swaps[hash] = Status.SWAP;
         Token(addressOfToken).burn(msg.sender, _amount);
 
-        emit InitSwap(_chainFrom,  _chainTo, msg.sender, _recipient, _amount, _nonce, _signature);
+        emit InitSwap(_chainFrom,  _chainTo, msg.sender, _recipient, _amount, _nonce);
     }
 
-    function redeem(uint256 _chainFrom, uint256 _chainTo, address _sender, address _recipient, uint256 _amount, uint256 _nonce, bytes memory _signature) external nonReentrant onlyChainId(_chainTo) onlyAllowedChainId(_chainFrom) {
+    function redeem(uint256 _chainFrom, uint256 _chainTo, address _sender, address _recipient, uint256 _amount, uint256 _nonce, bytes memory _signature) external onlyChainId(_chainTo) onlyAllowedChainId(_chainFrom) {
         bytes32 hash = keccak256(abi.encode(_chainFrom, _chainTo, _sender, _recipient, _amount, _nonce));
 
         require(swaps[hash] == Status.EMPTY, "swap status must be EMPTY");
