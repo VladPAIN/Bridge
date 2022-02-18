@@ -54,7 +54,7 @@ describe('Contract: Bridge', () => {
 
 		it('Should create swap', async () => {				
 			await expect(bridge1.connect(sender).initSwap(chainFrom, chainTo, recipient.address, amount, nonce, signature))
-				.to.emit(bridge1, 'InitSwap').withArgs(chainFrom, chainTo, sender.address, recipient.address, amount, nonce, signature);
+				.to.emit(bridge1, 'InitSwap').withArgs(chainFrom, chainTo, sender.address, recipient.address, amount, nonce);
 			
 			const swap = await bridge1.swaps(message);
 			expect(swap).to.equal(1);
